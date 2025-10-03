@@ -106,7 +106,7 @@ function LandingPage() {
           {/* Eco Persona Card */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 md:col-span-2 xl:col-span-1"
+            className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 md:col-span-2 xl:col-span-1 max-h-[28rem] overflow-y-auto"
           >
             <div className="flex flex-col sm:flex-row items-center sm:items-start mb-6">
               <div className="text-4xl mb-3 sm:mb-0 sm:mr-4">
@@ -146,7 +146,7 @@ function LandingPage() {
           {/* Badges Section */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            className="bg-white rounded-2xl shadow-lg p-6 max-h-[28rem] overflow-y-auto"
           >
             <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center justify-center sm:justify-start">
               <span className="text-2xl mr-2">🏆</span>
@@ -198,7 +198,7 @@ function LandingPage() {
           {/* Personalized Tips */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-lg p-6 md:col-span-2 xl:col-span-1"
+            className="bg-white rounded-2xl shadow-lg p-6 md:col-span-2 xl:col-span-1 max-h-[28rem] overflow-y-auto"
           >
             <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center justify-center sm:justify-start">
               <span className="text-2xl mr-2">💡</span>
