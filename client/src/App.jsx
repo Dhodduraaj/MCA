@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes,
-  useLocation,
+    Navigate,
+    Route,
+    BrowserRouter as Router,
+    Routes,
+    useLocation,
 } from "react-router-dom";
 import Chatbot from "./components/chatbot"; // chatbot component
 import Navbar from "./components/Navbar";
@@ -12,15 +12,16 @@ import { FinanceProvider, useFinance } from "./context/FinanceContext";
 import BudgetManagement from "./pages/BudgetManagement";
 import CalendarPage from "./pages/CalendarPage";
 import DebugAuth from "./pages/DebugAuth";
+import EcoSurvey from "./pages/EcoSurvey";
 import GitHubCallback from "./pages/GitHubCallback";
-import LandingPage from "./pages/LandingPage"; // Dashboard
 import HomePage from "./pages/HomePage"; // Public Landing Page
+import LandingPage from "./pages/LandingPage"; // Dashboard
+import Locator from "./pages/Locator";
 import Login from "./pages/Login";
+import MySpace from "./pages/MySpace";
 import Register from "./pages/Register";
 import TestAuth from "./pages/TestAuth";
 import TransactionManagement from "./pages/TransactionManagement";
-import MySpace from "./pages/MySpace";
-import Locator from "./pages/Locator";
 
 function AppWrapper() {
   return (
@@ -90,6 +91,10 @@ function App() {
         <Route
           path="/locator"
           element={user ? <Locator /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/eco-survey"
+          element={user ? <EcoSurvey /> : <Navigate to="/" />}
         />
       </Routes>
 

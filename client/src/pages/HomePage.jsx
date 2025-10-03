@@ -12,7 +12,7 @@ function HomePage() {
       dept: "Computer Science & Design",
       img: "/bm.jpg",
       github: "https://github.com/Prabu-21",
-      linkedin: "https://www.linkedin.com/in/prabakaransb/",
+      linkedin: "https://www.linkedin.com/in/dhodduraaj-s-p-08a9b7347/",
       leetcode: "https://leetcode.com/username",
     },
     {
@@ -28,7 +28,7 @@ function HomePage() {
       dept: "Computer Science & Design",
       img: "/bm.jpg",
       github: "https://github.com/DhurgashreeIyappan",
-      linkedin: "https://www.linkedin.com/in/dhurgashree-iyappan/",
+      linkedin: "https://www.linkedin.com/in/dharunsuriya-t-4916bb34b/",
       leetcode: "https://leetcode.com/username",
     },
     {
