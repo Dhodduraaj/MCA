@@ -22,6 +22,7 @@ import MySpace from "./pages/MySpace";
 import Register from "./pages/Register";
 import TestAuth from "./pages/TestAuth";
 import TransactionManagement from "./pages/TransactionManagement";
+import Calculate from "./pages/Calculate";
 import { clearOldUserData } from "./utils/userData";
 
 function AppWrapper() {
@@ -82,6 +83,10 @@ function App() {
         <Route
           path="/transactions"
           element={user ? <TransactionManagement /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/calculate"
+          element={user ? <Calculate /> : <Navigate to="/" />}
         />
         <Route
           path="/budgets"

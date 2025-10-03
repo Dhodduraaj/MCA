@@ -39,6 +39,7 @@ function Navbar({ user, setUser }) {
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-white/90 hover:text-white transition font-medium">Dashboard</Link>
             <Link to="/transactions" className="text-white/90 hover:text-white transition font-medium">Transactions</Link>
+            <Link to="/calculate" className="text-white/90 hover:text-white transition font-medium">Calculate</Link>
             <Link to="/budgets" className="text-white/90 hover:text-white transition font-medium">Budgets</Link>
             <Link to="/myspace" className="text-white/90 hover:text-white transition font-medium">MySpace</Link>
           </div>
@@ -100,6 +101,7 @@ function Navbar({ user, setUser }) {
         >
           <Link to="/" onClick={() => setMobileOpen(false)} className="px-6 py-3 hover:bg-[#2e7d32] transition text-white font-medium text-left w-full">Dashboard</Link>
           <Link to="/transactions" onClick={() => setMobileOpen(false)} className="px-6 py-3 hover:bg-[#2e7d32] transition text-white font-medium text-left w-full">Transactions</Link>
+          <Link to="/calculate" onClick={() => setMobileOpen(false)} className="px-6 py-3 hover:bg-[#2e7d32] transition text-white font-medium text-left w-full">Calculate</Link>
           <Link to="/budgets" onClick={() => setMobileOpen(false)} className="px-6 py-3 hover:bg-[#2e7d32] transition text-white font-medium text-left w-full">Budgets</Link>
           <Link to="/myspace" onClick={() => setMobileOpen(false)} className="px-6 py-3 hover:bg-[#2e7d32] transition text-white font-medium text-left w-full">MySpace</Link>
           <Link to="/locator" onClick={() => setMobileOpen(false)} className="px-6 py-3 hover:bg-[#2e7d32] transition text-white font-medium text-left w-full">Locator</Link>
