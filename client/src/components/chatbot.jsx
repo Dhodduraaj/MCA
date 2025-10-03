@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Maximize2, MessageCircle, Minimize2, Send, X } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [showButton, setShowButton] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hi! How can I help you today?" }
   ]);
@@ -59,6 +60,7 @@ function Chatbot() {
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
+    setIsFullscreen(false);
     setTimeout(() => setShowButton(true), 400); // wait for exit animation
   }, []);
 
@@ -85,7 +87,13 @@ function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-2">
+    <div
+      className={`${
+        isFullscreen
+          ? "fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col items-stretch"
+          : "fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-2"
+      }`}
+    >
 
       {/* Floating Chat Button (instant render, no fade) */}
       {showButton && !isOpen && (
@@ -107,7 +115,11 @@ function Chatbot() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="w-[380px] h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200"
+            className={`bg-white shadow-2xl flex flex-col overflow-hidden border border-gray-200 ${
+              isFullscreen
+                ? "w-full h-full rounded-none"
+                : "w-[380px] h-[500px] rounded-2xl"
+            }`}
           >
             {/* Header */}
             <div className="flex justify-between items-center bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white px-5 py-4">
@@ -115,9 +127,18 @@ function Chatbot() {
                 <h3 className="font-semibold text-lg">Finance Assistant</h3>
                 <p className="text-purple-100 text-xs opacity-90">Always here to help</p>
               </div>
-              <button onClick={handleClose} className="p-2 hover:bg-white/20 rounded-full">
-                <X size={18} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsFullscreen((v) => !v)}
+                  className="p-2 hover:bg-white/20 rounded-full"
+                  aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                >
+                  {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                </button>
+                <button onClick={handleClose} className="p-2 hover:bg-white/20 rounded-full">
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
