@@ -1,0 +1,32 @@
+frontend
+
+react-router-dom axios
+framer-motion
+lucide-react
+recharts
+@react-oauth/google jwt-decode
+react-chartjs-2
+tailwindcss
+@tailwindcss/vite
+gapi-script
+react-toastify
+react-big-calendar
+date-fns
+react-tooltip
+react-icons
+leaflet
+
+backend(node) npm install
+express
+axios
+dotenv
+body-parser
+cors
+google-auth-library
+@octokit/rest
+bcrypt
+jsonwebtoken
+mongoose
+react-toastify
+backend(python) pip install
+google-generativeai
