@@ -22,6 +22,7 @@ import MySpace from "./pages/MySpace";
 import Register from "./pages/Register";
 import TestAuth from "./pages/TestAuth";
 import TransactionManagement from "./pages/TransactionManagement";
+import { clearOldUserData } from "./utils/userData";
 
 function AppWrapper() {
   return (
@@ -42,6 +43,8 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
+      // Clear old user data when new user logs in
+      clearOldUserData();
       setUser(token);
       loadUserData();
     }

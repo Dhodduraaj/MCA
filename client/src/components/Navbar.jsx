@@ -41,8 +41,6 @@ function Navbar({ user, setUser }) {
             <Link to="/transactions" className="text-white/90 hover:text-white transition font-medium">Transactions</Link>
             <Link to="/budgets" className="text-white/90 hover:text-white transition font-medium">Budgets</Link>
             <Link to="/myspace" className="text-white/90 hover:text-white transition font-medium">MySpace</Link>
-            <Link to="/locator" className="text-white/90 hover:text-white transition font-medium">Locator</Link>
-            <Link to="/eco-survey" className="text-white/90 hover:text-white transition font-medium">🌱 Eco Survey</Link>
           </div>
         )}
 

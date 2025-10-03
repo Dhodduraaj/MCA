@@ -6,6 +6,8 @@ import ExchangeRateChart from "../components/ExchangeRateChart";
 import FinancialNewsCarouselLanding from "../components/FinancialNewsCarouselLanding";
 import Quotes from "../components/quotes";
 import WelcomeModal from "../components/WelcomeModal";
+import { getPersonalizedTips } from "../utils/ecoScore";
+import { clearAllUserSpecificData, clearOldUserData, getCurrentUserInfo, getUserEcoData, hasUserCompletedSurvey } from "../utils/userData";
 
 function LandingPage() {
   const [message, setMessage] = useState("");
@@ -13,6 +15,7 @@ function LandingPage() {
   const [ecoPersona, setEcoPersona] = useState("Eco Explorer");
   const [ecoScore, setEcoScore] = useState(25);
   const [surveyData, setSurveyData] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -37,55 +40,62 @@ function LandingPage() {
       setShowWelcomeModal(true);
     }
 
-    // Load eco data from localStorage
-    const savedPersona = localStorage.getItem("ecoPersona");
-    const savedScore = localStorage.getItem("ecoScore");
-    const savedSurveyData = localStorage.getItem("ecoSurveyData");
+    // Get current user info
+    const currentUser = getCurrentUserInfo();
+    setUserInfo(currentUser);
+
+    // Clear old user data when new user logs in
+    clearOldUserData();
+
+    // Load user-specific eco data
+    const ecoData = getUserEcoData();
     
-    if (savedPersona) setEcoPersona(savedPersona);
-    if (savedScore) setEcoScore(parseInt(savedScore));
-    if (savedSurveyData) setSurveyData(JSON.parse(savedSurveyData));
+    if (ecoData.surveyData) {
+      setSurveyData(ecoData.surveyData);
+      setEcoPersona(ecoData.persona);
+      setEcoScore(ecoData.score);
+    }
 
     // Check if user has completed eco survey - if not, redirect to survey
-    if (!savedSurveyData) {
+    if (!hasUserCompletedSurvey()) {
       navigate("/eco-survey");
     }
   }, [navigate, location.state]);
 
   const handleLogout = () => {
+    // Clear all user-specific data on logout
+    clearAllUserSpecificData();
+    
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  // Generate personalized tips based on survey data
-  const getPersonalizedTips = () => {
-    if (!surveyData) return [];
-    
-    const tips = [];
-    
-    if (surveyData.travel === "car") {
-      tips.push("Try public transport twice a week → save ₹500 + 2kg CO₂");
-    }
-    if (surveyData.food === "meat") {
-      tips.push("Have one meat-free day per week → reduce carbon footprint by 15%");
-    }
-    if (surveyData.shopping === "fast") {
-      tips.push("Buy one second-hand item this month → save money and resources");
-    }
-    if (surveyData.energy === "high") {
-      tips.push("Switch to LED bulbs → save ₹200/month on electricity");
-    }
-    if (surveyData.habits === "no") {
-      tips.push("Get a reusable water bottle → save ₹50/week on bottled water");
-    }
-    
-    return tips.length > 0 ? tips : ["Start with small changes - every step counts! 🌱"];
-  };
+  // Get personalized tips using the utility function
+  const personalizedTips = surveyData ? getPersonalizedTips(surveyData, ecoScore) : ["Start with small changes - every step counts! 🌱"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] pt-24">
+      {/* Welcome Message */}
+      {userInfo && (
+        <div className="px-4 pt-8 pb-4 max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+            className="text-center mb-6"
+          >
+            <h1 className="text-3xl font-bold text-green-800 mb-2">
+              Welcome back, {userInfo.name}! 🌱
+            </h1>
+            <p className="text-green-600">
+              Let's continue your eco-friendly journey together
+            </p>
+          </motion.div>
+        </div>
+      )}
+
       {/* Eco Dashboard Section */}
-      <div className="px-4 pt-8 pb-8 max-w-7xl mx-auto">
+      <div className="px-4 pt-4 pb-8 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -170,7 +180,7 @@ function LandingPage() {
               Personalized Tips
             </h3>
             <div className="space-y-3">
-              {getPersonalizedTips().map((tip, index) => (
+              {personalizedTips.map((tip, index) => (
                 <div key={index} className="flex items-start p-3 bg-green-50 rounded-lg">
                   <span className="text-green-500 mr-2 mt-1">✓</span>
                   <p className="text-sm text-gray-700">{tip}</p>

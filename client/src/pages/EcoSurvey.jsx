@@ -1,70 +1,228 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { calculateEcoScore, getEcoPersona } from "../utils/ecoScore";
+import { clearOldUserData, setUserSpecificData } from "../utils/userData";
 
 function EcoSurvey() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [surveyData, setSurveyData] = useState({
-    travel: "",
-    food: "",
-    shopping: "",
-    energy: "",
-    habits: "",
+    // Travel & Commuting
+    commute: "",
+    rideHailing: "",
+    weeklyKm: "0",
+    // Food & Diet
+    meatConsumption: "",
+    eatingOut: "",
+    organicFood: "",
+    // Shopping & Consumption
+    clothesFrequency: "",
+    ecoBrands: "",
+    reusableBags: "",
+    // Energy & Home
+    electricityBill: "",
+    switchOffAppliances: "",
+    energyEfficient: "",
+    // Habits & Mindset
+    reusableBottles: "",
+    recycling: "",
     goal: ""
   });
 
-  const questions = [
+  const categories = [
     {
       id: "travel",
-      title: "How do you usually travel?",
-      icon: "🚲",
-      options: [
-        { value: "car", label: "Car", emoji: "🚗" },
-        { value: "bike", label: "Bike/Motorcycle", emoji: "🏍️" },
-        { value: "public", label: "Public Transport", emoji: "🚌" },
-        { value: "cycle", label: "Cycle", emoji: "🚲" },
-        { value: "walk", label: "Walk", emoji: "🚶" }
+      title: "Travel & Commuting",
+      icon: "🚗",
+      questions: [
+        {
+          id: "commute",
+          title: "How do you usually commute to work/school?",
+          type: "radio",
+          options: [
+            { value: "walk", label: "Walk", emoji: "🚶" },
+            { value: "cycle", label: "Cycle", emoji: "🚲" },
+            { value: "public", label: "Public Transport", emoji: "🚌" },
+            { value: "bike", label: "Bike/Motorcycle", emoji: "🏍️" },
+            { value: "carpool", label: "Carpool", emoji: "🚗" },
+            { value: "car", label: "Personal Car", emoji: "🚗" }
+          ]
+        },
+        {
+          id: "rideHailing",
+          title: "How often do you use ride-hailing services (Uber, Ola)?",
+          type: "radio",
+          options: [
+            { value: "never", label: "Never", emoji: "❌" },
+            { value: "rarely", label: "Rarely", emoji: "🤔" },
+            { value: "few", label: "Few times a week", emoji: "📅" },
+            { value: "daily", label: "Daily", emoji: "📱" }
+          ]
+        },
+        {
+          id: "weeklyKm",
+          title: "How many kilometers do you drive per week?",
+          type: "slider",
+          min: 0,
+          max: 500,
+          step: 10,
+          unit: "km"
+        }
       ]
     },
     {
       id: "food",
-      title: "What's your food preference?",
-      icon: "🌱",
-      options: [
-        { value: "veg", label: "Vegetarian", emoji: "🥬" },
-        { value: "mixed", label: "Mixed Diet", emoji: "🥗" },
-        { value: "meat", label: "Mostly Meat", emoji: "🥩" }
+      title: "Food & Diet",
+      icon: "🍽️",
+      questions: [
+        {
+          id: "meatConsumption",
+          title: "How often do you eat meat or fish?",
+          type: "radio",
+          options: [
+            { value: "never", label: "Never (Vegetarian/Vegan)", emoji: "🌱" },
+            { value: "rarely", label: "Rarely", emoji: "🥗" },
+            { value: "weekly", label: "Weekly", emoji: "🍖" },
+            { value: "daily", label: "Daily", emoji: "🥩" }
+          ]
+        },
+        {
+          id: "eatingOut",
+          title: "How often do you eat out or order food?",
+          type: "radio",
+          options: [
+            { value: "never", label: "Never (Always cook at home)", emoji: "🏠" },
+            { value: "monthly", label: "Monthly", emoji: "📅" },
+            { value: "weekly", label: "Weekly", emoji: "🍽️" },
+            { value: "daily", label: "Daily", emoji: "🍕" }
+          ]
+        },
+        {
+          id: "organicFood",
+          title: "How often do you buy locally grown or organic food?",
+          type: "radio",
+          options: [
+            { value: "always", label: "Always", emoji: "🌿" },
+            { value: "often", label: "Often", emoji: "🥬" },
+            { value: "sometimes", label: "Sometimes", emoji: "🥕" },
+            { value: "never", label: "Never", emoji: "🏪" }
+          ]
+        }
       ]
     },
     {
       id: "shopping",
-      title: "How do you prefer to shop?",
+      title: "Shopping & Consumption",
       icon: "🛍️",
-      options: [
-        { value: "eco", label: "Eco-friendly brands", emoji: "🌿" },
-        { value: "second", label: "Second-hand items", emoji: "♻️" },
-        { value: "fast", label: "Fast fashion", emoji: "👕" }
+      questions: [
+        {
+          id: "clothesFrequency",
+          title: "How often do you buy new clothes?",
+          type: "radio",
+          options: [
+            { value: "rarely", label: "Rarely (Only when needed)", emoji: "👕" },
+            { value: "seasonally", label: "Seasonally", emoji: "👗" },
+            { value: "monthly", label: "Monthly", emoji: "🛍️" },
+            { value: "weekly", label: "Weekly", emoji: "💳" }
+          ]
+        },
+        {
+          id: "ecoBrands",
+          title: "How often do you choose eco-friendly or sustainable brands?",
+          type: "radio",
+          options: [
+            { value: "always", label: "Always", emoji: "🌿" },
+            { value: "often", label: "Often", emoji: "♻️" },
+            { value: "sometimes", label: "Sometimes", emoji: "🤔" },
+            { value: "never", label: "Never", emoji: "❌" }
+          ]
+        },
+        {
+          id: "reusableBags",
+          title: "How often do you use reusable shopping bags?",
+          type: "radio",
+          options: [
+            { value: "always", label: "Always", emoji: "🛍️" },
+            { value: "often", label: "Often", emoji: "♻️" },
+            { value: "sometimes", label: "Sometimes", emoji: "🤔" },
+            { value: "never", label: "Never", emoji: "❌" }
+          ]
+        }
       ]
     },
     {
       id: "energy",
-      title: "What's your monthly electricity bill range?",
+      title: "Energy & Home",
       icon: "⚡",
-      options: [
-        { value: "low", label: "Under ₹1,000", emoji: "💡" },
-        { value: "medium", label: "₹1,000 - ₹3,000", emoji: "🔌" },
-        { value: "high", label: "Over ₹3,000", emoji: "⚡" }
+      questions: [
+        {
+          id: "electricityBill",
+          title: "What's your monthly electricity bill range?",
+          type: "radio",
+          options: [
+            { value: "low", label: "Under ₹1,000", emoji: "💡" },
+            { value: "medium", label: "₹1,000 - ₹3,000", emoji: "🔌" },
+            { value: "high", label: "Over ₹3,000", emoji: "⚡" }
+          ]
+        },
+        {
+          id: "switchOffAppliances",
+          title: "How often do you switch off appliances when not in use?",
+          type: "radio",
+          options: [
+            { value: "always", label: "Always", emoji: "✅" },
+            { value: "often", label: "Often", emoji: "👍" },
+            { value: "sometimes", label: "Sometimes", emoji: "🤔" },
+            { value: "never", label: "Never", emoji: "❌" }
+          ]
+        },
+        {
+          id: "energyEfficient",
+          title: "How many of your appliances are energy-efficient (LED, 5-star rated)?",
+          type: "radio",
+          options: [
+            { value: "all", label: "All of them", emoji: "⭐" },
+            { value: "most", label: "Most of them", emoji: "👍" },
+            { value: "some", label: "Some of them", emoji: "🤔" },
+            { value: "none", label: "None", emoji: "❌" }
+          ]
+        }
       ]
     },
     {
       id: "habits",
-      title: "Do you use reusable bottles and bags?",
+      title: "Habits & Mindset",
       icon: "♻️",
-      options: [
-        { value: "yes", label: "Yes, always", emoji: "✅" },
-        { value: "sometimes", label: "Sometimes", emoji: "🤔" },
-        { value: "no", label: "No", emoji: "❌" }
+      questions: [
+        {
+          id: "reusableBottles",
+          title: "How often do you use reusable bottles or cups?",
+          type: "radio",
+          options: [
+            { value: "always", label: "Always", emoji: "🍶" },
+            { value: "often", label: "Often", emoji: "♻️" },
+            { value: "sometimes", label: "Sometimes", emoji: "🤔" },
+            { value: "never", label: "Never", emoji: "❌" }
+          ]
+        },
+        {
+          id: "recycling",
+          title: "How often do you recycle household waste?",
+          type: "radio",
+          options: [
+            { value: "always", label: "Always", emoji: "♻️" },
+            { value: "often", label: "Often", emoji: "👍" },
+            { value: "sometimes", label: "Sometimes", emoji: "🤔" },
+            { value: "never", label: "Never", emoji: "❌" }
+          ]
+        },
+        {
+          id: "goal",
+          title: "What's one green goal you'd like to achieve this year?",
+          type: "text",
+          placeholder: "e.g., Reduce my carbon footprint by 20%, Start composting, Use public transport more..."
+        }
       ]
     }
   ];
@@ -77,7 +235,7 @@ function EcoSurvey() {
   };
 
   const handleNext = () => {
-    if (currentStep < questions.length - 1) {
+    if (currentStep < categories.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -89,21 +247,35 @@ function EcoSurvey() {
   };
 
   const handleSubmit = async () => {
-    // Mock API call
-    console.log("Survey submitted:", surveyData);
+    // Calculate eco score and persona
+    const ecoScore = calculateEcoScore(surveyData);
+    const persona = getEcoPersona(ecoScore);
     
-    // Store in localStorage for demo
-    localStorage.setItem("ecoSurveyData", JSON.stringify(surveyData));
-    localStorage.setItem("ecoPersona", "Eco Explorer");
-    localStorage.setItem("ecoScore", "25");
+    // Clear old user data first
+    clearOldUserData();
+    
+    // Store user-specific data
+    setUserSpecificData('ecoSurveyData', surveyData);
+    setUserSpecificData('ecoPersona', persona);
+    setUserSpecificData('ecoScore', ecoScore);
     
     // Show welcome modal and redirect
     navigate("/dashboard", { state: { showWelcomeModal: true } });
   };
 
-  const currentQuestion = questions[currentStep];
-  const progress = ((currentStep + 1) / questions.length) * 100;
-  const isLastStep = currentStep === questions.length - 1;
+  const currentCategory = categories[currentStep];
+  const progress = ((currentStep + 1) / categories.length) * 100;
+  const isLastStep = currentStep === categories.length - 1;
+
+  // Check if current category is complete
+  const isCurrentCategoryComplete = () => {
+    return currentCategory.questions.every(question => {
+      if (question.type === "text") {
+        return surveyData[question.id] && surveyData[question.id].trim() !== "";
+      }
+      return surveyData[question.id] !== "";
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 pt-24 pb-12">
@@ -141,7 +313,7 @@ function EcoSurvey() {
           </p>
         </motion.div>
 
-        {/* Question Card */}
+        {/* Category Card */}
         <motion.div
           key={currentStep}
           initial={{ opacity: 0, x: 50 }}
@@ -151,60 +323,82 @@ function EcoSurvey() {
           className="bg-white rounded-2xl shadow-lg p-8 mb-8"
         >
           <div className="text-center mb-6">
-            <div className="text-4xl mb-4">{currentQuestion.icon}</div>
+            <div className="text-4xl mb-4">{currentCategory.icon}</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {currentQuestion.title}
+              {currentCategory.title}
             </h2>
             <p className="text-gray-600">
-              Step {currentStep + 1} of {questions.length}
+              Step {currentStep + 1} of {categories.length}
             </p>
           </div>
 
-          <div className="space-y-3">
-            {currentQuestion.options.map((option) => (
-              <motion.button
-                key={option.value}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleOptionSelect(currentQuestion.id, option.value)}
-                className={`w-full p-4 rounded-xl border-2 transition-all duration-200 ${
-                  surveyData[currentQuestion.id] === option.value
-                    ? "border-green-500 bg-green-50 text-green-700"
-                    : "border-gray-200 hover:border-green-300 hover:bg-green-50"
-                }`}
-              >
-                <div className="flex items-center justify-center space-x-3">
-                  <span className="text-2xl">{option.emoji}</span>
-                  <span className="font-medium">{option.label}</span>
-                </div>
-              </motion.button>
+          <div className="space-y-8">
+            {currentCategory.questions.map((question, questionIndex) => (
+              <div key={question.id} className="border-b border-gray-100 pb-6 last:border-b-0">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  {questionIndex + 1}. {question.title}
+                </h3>
+                
+                {question.type === "radio" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {question.options.map((option) => (
+                      <motion.button
+                        key={option.value}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleOptionSelect(question.id, option.value)}
+                        className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                          surveyData[question.id] === option.value
+                            ? "border-green-500 bg-green-50 text-green-700"
+                            : "border-gray-200 hover:border-green-300 hover:bg-green-50"
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <span className="text-2xl">{option.emoji}</span>
+                          <span className="font-medium text-sm">{option.label}</span>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
+
+                {question.type === "slider" && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">0 {question.unit}</span>
+                      <span className="text-lg font-semibold text-green-600">
+                        {surveyData[question.id] || question.min} {question.unit}
+                      </span>
+                      <span className="text-sm text-gray-600">{question.max} {question.unit}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={question.min}
+                      max={question.max}
+                      step={question.step}
+                      value={surveyData[question.id] || question.min}
+                      onChange={(e) => handleOptionSelect(question.id, e.target.value)}
+                      className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #2e7d32 0%, #2e7d32 ${((surveyData[question.id] || question.min) - question.min) / (question.max - question.min) * 100}%, #e5e7eb ${((surveyData[question.id] || question.min) - question.min) / (question.max - question.min) * 100}%, #e5e7eb 100%)`
+                      }}
+                    />
+                  </div>
+                )}
+
+                {question.type === "text" && (
+                  <textarea
+                    value={surveyData[question.id] || ""}
+                    onChange={(e) => handleOptionSelect(question.id, e.target.value)}
+                    placeholder={question.placeholder}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none resize-none"
+                    rows={3}
+                  />
+                )}
+              </div>
             ))}
           </div>
         </motion.div>
-
-        {/* Optional Goal Question */}
-        {isLastStep && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-lg p-8 mb-8"
-          >
-            <div className="text-center mb-6">
-              <div className="text-4xl mb-4">🎯</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                What's one green goal for this year?
-              </h2>
-              <p className="text-gray-600">(Optional - but we'd love to know!)</p>
-            </div>
-            <textarea
-              value={surveyData.goal}
-              onChange={(e) => setSurveyData(prev => ({ ...prev, goal: e.target.value }))}
-              placeholder="e.g., Reduce my carbon footprint by 20%, Start composting, Use public transport more..."
-              className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none resize-none"
-              rows={3}
-            />
-          </motion.div>
-        )}
 
         {/* Navigation Buttons */}
         <div className="flex justify-between">
@@ -227,7 +421,12 @@ function EcoSurvey() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleSubmit}
-              className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg transition-all"
+              disabled={!isCurrentCategoryComplete()}
+              className={`px-8 py-3 font-semibold rounded-xl shadow-lg transition-all ${
+                !isCurrentCategoryComplete()
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700 text-white"
+              }`}
             >
               Complete Survey 🎉
             </motion.button>
@@ -236,9 +435,9 @@ function EcoSurvey() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleNext}
-              disabled={!surveyData[currentQuestion.id]}
+              disabled={!isCurrentCategoryComplete()}
               className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                !surveyData[currentQuestion.id]
+                !isCurrentCategoryComplete()
                   ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                   : "bg-green-600 hover:bg-green-700 text-white"
               }`}

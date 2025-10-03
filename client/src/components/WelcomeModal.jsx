@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
+import { getCurrentUserInfo } from "../utils/userData";
 
 function WelcomeModal({ isOpen, onClose, persona, ecoScore }) {
   if (!isOpen) return null;
 
+  const userInfo = getCurrentUserInfo();
   const personaData = {
     "Eco Explorer": {
       emoji: "🌱",
@@ -43,7 +45,7 @@ function WelcomeModal({ isOpen, onClose, persona, ecoScore }) {
         <div className="text-center mb-6">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-3xl font-bold text-green-800 mb-2">
-            Welcome to Greefin!
+            Welcome to Greefin{userInfo ? `, ${userInfo.name}` : ''}!
           </h2>
           <p className="text-gray-600">
             Based on your choices, you're an <span className="font-semibold text-green-600">{currentPersona.title}</span> 🌍
