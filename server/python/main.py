@@ -46,7 +46,7 @@ def clean_reply(text: str) -> str:
 # ================================
 @app.get("/")
 def root():
-    return {"status": "ok", "message": "Chatbot backend running with Gemini (Financial Agent & Statement QA)!"}
+    return {"status": "ok", "message": "Chatbot backend running with Gemini (Green Lifestyle & Finance Tracker)!"}
 
 
 @app.post("/chat")
@@ -70,13 +70,15 @@ async def chat(request: Request):
             context_messages += f"{prefix} {msg['content']}\n"
 
         full_prompt = f"""
-You are a highly skilled financial assistant for a Finance Tracker application.
-- Help users understand their income, expenses, savings, and investments.
-- Provide short, concise, actionable advice.
-- Maintain context of previous messages in the conversation.
-- Always respond politely and clearly.
-- If the query is not finance-related, gently redirect the user back to finance topics.
-Respond in plain text, no greetings, no Markdown symbols, and keep answers brief.
+You are a sustainability and finance assistant for a Green Lifestyle & Finance Tracker application.
+
+Your role is to help users plan their daily tasks, travel, purchases, and lifestyle choices by balancing carbon emissions and financial costs.
+
+- Always calculate or estimate the carbon footprint and money impact of the user’s actions.
+- Provide answers in a short, point-by-point format (numbered 1), 2), 3)...).
+- Keep each point concise and clear.
+- Do not include extra text, greetings, or markdown.
+- If the query is not related to sustainability, carbon, or finance, gently guide the user back to these topics.
 
 {context_messages}Assistant:
 """
@@ -140,14 +142,16 @@ async def chat_statement(request: Request):
         chat_session = model.start_chat(history=[])
 
         system_prompt = f"""
-You are analyzing a bank statement. Here is the statement text:
+You are analyzing a user’s bank statement for a Green Lifestyle & Finance Tracker.
 
+Here is the statement text:
 {statement_text}
 
-- Answer user questions about transactions, amounts, balances, dates, 
-  merchants, and categories.
-- If the information is not explicitly in the statement, say you cannot find it.
-- Be concise and accurate.
+- Answer questions with concise, accurate points.
+- Always format answers as numbered points (1), 2), 3)...).
+- Highlight both spending patterns and estimated carbon impact.
+- Provide short, actionable eco-friendly and cost-saving suggestions.
+- If information is missing, say you cannot find it.
 """
         chat_session.send_message(system_prompt)
         response = chat_session.send_message(question)
@@ -159,9 +163,8 @@ You are analyzing a bank statement. Here is the statement text:
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
-
 # ================================
-# New route: month-summariser
+# Weekly summariser
 # ================================
 @app.post("/week-summariser")
 async def week_summariser():
@@ -175,24 +178,25 @@ async def week_summariser():
     if not statement_text:
         return JSONResponse({"error": f"{txt_path} is empty"}, status_code=400)
 
-    # Updated Gemini prompt for weekly summary
     prompt = f"""
-You are a finance assistant. The following is the bank statement text:
+You are a sustainability and finance assistant. The following is the user’s bank statement text:
 {statement_text}
 
-- Analyze the statement only for the current week.
--give consise and short reply
-- Return exactly 3 short insights (no more, no less).
+- Analyze expenses only for the current week.
+- Highlight both money and possible carbon impact.
+- Give concise output: exactly 3 short insights.
 - Each insight must be structured and numbered like:
   1) ...
   2) ...
   3) ...
-- Do not include extra text, headers, or markdown.
 """
     response = model.generate_content(prompt)
     return {"week_summary": clean_reply(response.text)}
 
 
+# ================================
+# Monthly summariser
+# ================================
 @app.post("/month-summariser")
 async def month_summariser():
     txt_path = "extracted_text.txt"
@@ -205,23 +209,20 @@ async def month_summariser():
     if not statement_text:
         return JSONResponse({"error": f"{txt_path} is empty"}, status_code=400)
 
-    # Updated Gemini prompt for monthly summary
     prompt = f"""
-You are a finance assistant. The following is the bank statement text:
+You are a sustainability and finance assistant. The following is the user’s bank statement text:
 {statement_text}
 
-- Analyze the statement only for the current month.
--give consise and short reply
-- Return exactly 3 short insights (no more, no less).
+- Analyze expenses only for the current month.
+- Highlight both money and possible carbon impact.
+- Give concise output: exactly 3 short insights.
 - Each insight must be structured and numbered like:
   1) ...
   2) ...
   3) ...
-- Do not include extra text, headers, or markdown.
 """
     response = model.generate_content(prompt)
     return {"month_summary": clean_reply(response.text)}
-
 
 
 # ================================
