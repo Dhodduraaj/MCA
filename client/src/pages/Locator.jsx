@@ -1,52 +1,4 @@
-import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-
-// Fix for default markers in react-leaflet
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
-// Custom icons
-const createCustomIcon = (color) => {
-  return L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div style="
-      background-color: ${color};
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      border: 3px solid white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: white;
-      font-weight: bold;
-    ">${color === '#2e7d32' ? '🌳' : '🍃'}</div>`,
-    iconSize: [25, 25],
-    iconAnchor: [12, 12],
-  });
-};
-
-const bankIcon = createCustomIcon('#2e7d32');
-const atmIcon = createCustomIcon('#4caf50');
-
-function PanTo({ position }) {
-  const map = useMap();
-  useEffect(() => {
-    if (position) map.flyTo(position, 16);
-  }, [position, map]);
-  return null;
-}
+import { useEffect, useRef, useState } from 'react';
 
 function Locator() {
   const [position, setPosition] = useState(null);
@@ -55,7 +7,10 @@ function Locator() {
   const [banks, setBanks] = useState([]);
   const [atms, setATMs] = useState([]);
   const [placesLoading, setPlacesLoading] = useState(false);
-  const [panPosition, setPanPosition] = useState(null);
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const placesService = useRef(null);
+  const userMarker = useRef(null);
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
@@ -70,70 +25,140 @@ function Locator() {
     return R * c;
   };
 
-  const fetchNearbyPlaces = async (lat, lon) => {
+  const fetchNearbyPlaces = (lat, lon) => {
+    if (!placesService.current) return;
     setPlacesLoading(true);
-    try {
-      const radius = 20000;
-      const query = `
-        [out:json][timeout:25];
-        (
-          node["amenity"="atm"](around:${radius},${lat},${lon});
-          node["amenity"="bank"](around:${radius},${lat},${lon});
-          way["amenity"="atm"](around:${radius},${lat},${lon});
-          way["amenity"="bank"](around:${radius},${lat},${lon});
-        );
-        out center;
-      `;
-      const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
+
+    const location = new window.google.maps.LatLng(lat, lon);
+
+    const nearby = (type, cb) => {
+      placesService.current.nearbySearch(
+        {
+          location,
+          radius: 20000,
+          type
+        },
+        (results, status) => {
+          if (status !== window.google.maps.places.PlacesServiceStatus.OK || !results) {
+            cb([]);
+            return;
+          }
+          const mapped = results.map((r) => {
+            const coords = [r.geometry.location.lat(), r.geometry.location.lng()];
+            return {
+              id: r.place_id,
+              name: r.name,
+              position: coords,
+              distance: calculateDistance(lat, lon, coords[0], coords[1]),
+              address: r.vicinity || r.formatted_address || "",
+            };
+          });
+          cb(mapped.sort((a, b) => a.distance - b.distance).slice(0, 5));
+        }
       );
-      const data = await response.json();
+    };
 
-      const bankList = [];
-      const atmList = [];
-      data.elements.forEach((el) => {
-        const coords = el.center ? [el.center.lat, el.center.lon] : [el.lat, el.lon];
-        const distance = calculateDistance(lat, lon, coords[0], coords[1]);
-        const place = {
-          id: el.id,
-          name: el.tags?.name || (el.tags?.amenity === 'bank' ? `Bank #${el.id}` : `ATM #${el.id}`),
-          position: coords,
-          distance,
-          tags: el.tags,
-          amenity: el.tags?.amenity,
-        };
-        if (el.tags?.amenity === 'bank') bankList.push(place);
-        else if (el.tags?.amenity === 'atm') atmList.push(place);
-      });
-
-      setBanks(bankList.sort((a, b) => a.distance - b.distance).slice(0, 5));
-      setATMs(atmList.sort((a, b) => a.distance - b.distance).slice(0, 5));
-    } catch (err) {
-      console.error(err);
-    } finally {
+    let banksOut = [];
+    let atmsOut = [];
+    nearby('bank', (b) => {
+      banksOut = b;
+      setBanks(banksOut);
       setPlacesLoading(false);
-    }
+    });
+    nearby('atm', (a) => {
+      atmsOut = a;
+      setATMs(atmsOut);
+      setPlacesLoading(false);
+    });
+  };
+
+  const loadGoogleMaps = () => {
+    return new Promise((resolve, reject) => {
+      if (window.google && window.google.maps) {
+        resolve();
+        return;
+      }
+      const existing = document.getElementById('google-maps');
+      if (existing) {
+        existing.addEventListener('load', () => resolve());
+        existing.addEventListener('error', () => reject(new Error('Google Maps failed to load')));
+        return;
+      }
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        reject(new Error('Missing VITE_GOOGLE_MAPS_API_KEY'));
+        return;
+      }
+      const script = document.createElement('script');
+      script.id = 'google-maps';
+      script.async = true;
+      script.defer = true;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Google Maps failed to load'));
+      document.body.appendChild(script);
+    });
   };
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setError('Geolocation not supported');
-      setLoading(false);
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords = [pos.coords.latitude, pos.coords.longitude];
-        setPosition(coords);
+    let cancelled = false;
+    const init = async () => {
+      try {
+        await loadGoogleMaps();
+        if (cancelled) return;
+
+        if (!navigator.geolocation) {
+          setError('Geolocation not supported');
+          setLoading(false);
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            if (cancelled) return;
+            const coords = [pos.coords.latitude, pos.coords.longitude];
+            setPosition(coords);
+
+            // Initialize map
+            mapInstance.current = new window.google.maps.Map(mapRef.current, {
+              center: { lat: coords[0], lng: coords[1] },
+              zoom: 15,
+              mapTypeControl: false,
+              streetViewControl: false,
+              fullscreenControl: false
+            });
+
+            placesService.current = new window.google.maps.places.PlacesService(mapInstance.current);
+
+            userMarker.current = new window.google.maps.Marker({
+              position: { lat: coords[0], lng: coords[1] },
+              map: mapInstance.current,
+              title: 'You are here',
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: '#1e88e5',
+                fillOpacity: 1,
+                strokeColor: '#ffffff',
+                strokeWeight: 2
+              }
+            });
+
+            setLoading(false);
+            fetchNearbyPlaces(coords[0], coords[1]);
+          },
+          (err) => {
+            setError(err.message);
+            setLoading(false);
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        );
+      } catch (e) {
+        setError(e.message || 'Failed to load map');
         setLoading(false);
-        fetchNearbyPlaces(coords[0], coords[1]);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-    );
+      }
+    };
+    init();
+    return () => { cancelled = true; };
   }, []);
 
   if (loading)
@@ -149,50 +174,8 @@ function Locator() {
     <div className="min-h-[calc(100vh-64px)] bg-gray-50 pt-16">
       <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-64px)]">
         {/* Map */}
-        <div className="flex-none w-full lg:w-2/3 bg-white rounded-lg shadow-lg overflow-hidden flex-1">
-          <MapContainer center={position} zoom={15} style={{ height: '100%', width: '100%' }}>
-            <TileLayer
-              attribution="&copy; OpenStreetMap contributors"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={position}>
-              <Popup>
-                <strong>📍 You are here!</strong>
-                <br />
-                Lat: {position[0].toFixed(6)}, Lng: {position[1].toFixed(6)}
-              </Popup>
-            </Marker>
-
-            {banks.map((bank) => (
-              <Marker key={bank.id} position={bank.position} icon={bankIcon}>
-                <Popup>
-                  <div className="text-center">
-                    <div className="text-2xl mb-2">🌳</div>
-                    <strong>{bank.name}</strong>
-                    <br />
-                    {bank.distance.toFixed(2)} km away
-                    {bank.tags?.addr_street && <div>{bank.tags.addr_street}</div>}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-
-            {atms.map((atm) => (
-              <Marker key={atm.id} position={atm.position} icon={atmIcon}>
-                <Popup>
-                  <div className="text-center">
-                    <div className="text-2xl mb-2">🏧</div>
-                    <strong>{atm.name}</strong>
-                    <br />
-                    {atm.distance.toFixed(2)} km away
-                    {atm.tags?.addr_street && <div>{atm.tags.addr_street}</div>}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-
-            {panPosition && <PanTo position={panPosition} />}
-          </MapContainer>
+        <div className="w-full lg:w-2/3 bg-white rounded-lg shadow-lg overflow-hidden min-h-[60vh] lg:min-h-[calc(100vh-160px)]">
+          <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
         </div>
 
         {/* Banks & ATMs List */}
@@ -205,7 +188,24 @@ function Locator() {
             {banks.map((bank, i) => (
               <div
                 key={bank.id}
-                onClick={() => setPanPosition(bank.position)}
+                onClick={() => {
+                  if (mapInstance.current) {
+                    mapInstance.current.panTo({ lat: bank.position[0], lng: bank.position[1] });
+                    new window.google.maps.Marker({
+                      position: { lat: bank.position[0], lng: bank.position[1] },
+                      map: mapInstance.current,
+                      title: bank.name,
+                      icon: {
+                        path: window.google.maps.SymbolPath.CIRCLE,
+                        scale: 8,
+                        fillColor: '#2e7d32',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                      }
+                    });
+                  }
+                }}
                 className={`p-4 rounded-lg shadow-sm border mb-2 cursor-pointer flex flex-col ${
                   i === 0 ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'
                 }`}
@@ -217,7 +217,7 @@ function Locator() {
                     <p className="text-sm font-semibold text-blue-600">{bank.distance.toFixed(2)} km away</p>
                   </div>
                 </div>
-                {bank.tags?.addr_street && <p className="text-xs text-gray-500 ml-11">{bank.tags.addr_street}</p>}
+                {bank.address && <p className="text-xs text-gray-500 ml-11">{bank.address}</p>}
               </div>
             ))}
           </div>
@@ -230,7 +230,24 @@ function Locator() {
             {atms.map((atm, i) => (
               <div
                 key={atm.id}
-                onClick={() => setPanPosition(atm.position)}
+                onClick={() => {
+                  if (mapInstance.current) {
+                    mapInstance.current.panTo({ lat: atm.position[0], lng: atm.position[1] });
+                    new window.google.maps.Marker({
+                      position: { lat: atm.position[0], lng: atm.position[1] },
+                      map: mapInstance.current,
+                      title: atm.name,
+                      icon: {
+                        path: window.google.maps.SymbolPath.CIRCLE,
+                        scale: 8,
+                        fillColor: '#4caf50',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                      }
+                    });
+                  }
+                }}
                 className={`p-4 rounded-lg shadow-sm border mb-2 cursor-pointer flex flex-col ${
                   i === 0 ? 'bg-green-50 border-green-300' : 'bg-white border-gray-200'
                 }`}
@@ -242,7 +259,7 @@ function Locator() {
                     <p className="text-sm font-semibold text-green-600">{atm.distance.toFixed(2)} km away</p>
                   </div>
                 </div>
-                {atm.tags?.addr_street && <p className="text-xs text-gray-500 ml-11">{atm.tags.addr_street}</p>}
+                {atm.address && <p className="text-xs text-gray-500 ml-11">{atm.address}</p>}
               </div>
             ))}
           </div>
