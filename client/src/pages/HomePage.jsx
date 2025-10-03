@@ -8,8 +8,8 @@ function HomePage() {
   // 👇 Team Data
   const team = [
     {
-      name: "Prabhakaran SB",
-      dept: "Artificial Intelligence & Data Science",
+      name: "Dhodduraaj SP",
+      dept: "Computer Science & Design",
       img: "/bm.jpg",
       github: "https://github.com/Prabu-21",
       linkedin: "https://www.linkedin.com/in/prabakaransb/",
@@ -24,9 +24,9 @@ function HomePage() {
       leetcode: "https://leetcode.com/u/dharnishbm/",
     },
     {
-      name: "Dhurgashree I",
-      dept: "Information Technology",
-      img: "/ds.jpg",
+      name: "Dharun Suriya T",
+      dept: "Computer Science & Design",
+      img: "/bm.jpg",
       github: "https://github.com/DhurgashreeIyappan",
       linkedin: "https://www.linkedin.com/in/dhurgashree-iyappan/",
       leetcode: "https://leetcode.com/username",
@@ -37,14 +37,6 @@ function HomePage() {
       img: "/ar.jpg",
       github: "https://github.com/Arun2005s",
       linkedin: "https://www.linkedin.com/in/arun2005s/",
-      leetcode: "https://leetcode.com/username",
-    },
-    {
-      name: "Divya R",
-      dept: "Information Technology",
-      img: "/dr.jpg",
-      github: "https://github.com/Divyaaravichandran",
-      linkedin: "https://www.linkedin.com/in/divyaaravichandran/",
       leetcode: "https://leetcode.com/username",
     },
   ];
@@ -105,13 +97,15 @@ function HomePage() {
           <h2 className="text-4xl font-extrabold text-[#2b2d42]">
             Meet the Team 🚀
           </h2>
-          <p className="mt-4 text-[#2b2d42]/80 text-lg max-w-2xl mx-auto">
-            We're the builders behind Greefin – passionate problem solvers 
-            dedicated to making financial tracking seamless and empowering.
-          </p>
+          <p className="mt-4 text-[#2e7d32]/80 text-lg max-w-2xl mx-auto">
+  At <span className="font-semibold text-[#2e7d32]">Greefin</span>, we’re passionate 
+  about building smarter tools that make managing money effortless 🌱 
+  while inspiring sustainable choices for a brighter future.  
+</p>
+
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 px-6">
           {team.map((member, idx) => (
             <motion.div
               key={idx}
