@@ -33,7 +33,7 @@ function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] pt-24">
+    <div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] pt-24">
       {/* Financial News Section */}
       <div className="px-4 pt-8 pb-12 max-w-7xl mx-auto">
         <motion.div

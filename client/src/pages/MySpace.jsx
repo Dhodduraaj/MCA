@@ -7,7 +7,7 @@ import MonthlySummariser from "../components/MonthlySummariser";
 
 function MySpace() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] pt-24 px-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] pt-24 px-6">
       <h1 className="text-3xl font-bold mb-8 text-gray-900">
         MySpace - Finance Dashboard
       </h1>

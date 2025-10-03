@@ -71,7 +71,7 @@ function SpeakWithStatement() {
           className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition ${
             loading
               ? "bg-purple-300 cursor-not-allowed"
-              : "bg-gradient-to-r from-[#7209b7] to-[#9d4edd] hover:scale-[1.03]"
+              : "bg-gradient-to-r from-[#2e7d32] to-[#4caf50] hover:scale-[1.03]"
           }`}
         >
           {loading ? "..." : "Ask"}

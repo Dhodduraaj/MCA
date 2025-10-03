@@ -86,7 +86,7 @@ function UploadStatement() {
       <button
         onClick={handleUpload}
         disabled={loading}
-        className="mt-4 w-full py-2 bg-gradient-to-r from-[#7209b7] to-[#9d4edd] text-white text-sm font-medium rounded-lg shadow hover:scale-[1.02] transition"
+        className="mt-4 w-full py-2 bg-gradient-to-r from-[#2e7d32] to-[#4caf50] text-white text-sm font-medium rounded-lg shadow hover:scale-[1.02] transition"
       >
         {loading ? "Uploading..." : "Upload"}
       </button>

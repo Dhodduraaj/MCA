@@ -64,7 +64,7 @@ function ExchangeRateChart() {
   const maxY = Math.max(...data.map(d => d.INR)) + 0.2;
 
   return (
-    <div className="w-full max-w-md h-72 p-4 bg-gradient-to-br from-white/90 to-gray-50 shadow-lg rounded-2xl border border-gray-200">
+    <div className="w-full max-w-md h-72 p-4 bg-gradient-to-br from-white/90 to-green-50 shadow-lg rounded-2xl border border-green-200">
       <div className="mb-2">
         <h3 className="font-semibold text-gray-800 text-lg">USD → INR</h3>
         <p className="text-gray-500 text-xs">Last 30 Days</p>
@@ -94,13 +94,13 @@ function ExchangeRateChart() {
             dataKey="INR"
             stroke="url(#gradientLine)"
             strokeWidth={3}
-            dot={{ r: 3, fill: "#7c3aed" }}
+            dot={{ r: 3, fill: "#2e7d32" }}
             activeDot={{ r: 5 }}
           />
           <defs>
             <linearGradient id="gradientLine" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#8b5cf6" />
-              <stop offset="100%" stopColor="#7c3aed" />
+              <stop offset="0%" stopColor="#4caf50" />
+              <stop offset="100%" stopColor="#2e7d32" />
             </linearGradient>
           </defs>
         </LineChart>

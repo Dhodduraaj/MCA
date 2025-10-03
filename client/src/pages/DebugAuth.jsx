@@ -57,7 +57,7 @@ const DebugAuth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] pt-24 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] pt-24 pb-12">
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-4xl font-bold text-gray-800 mb-8">Authentication Debug</h1>
         

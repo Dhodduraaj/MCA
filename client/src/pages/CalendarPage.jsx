@@ -171,7 +171,7 @@ function CalendarPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-screen min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] pt-16"
+      className="w-screen min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] pt-16"
     >
       {/* Calendar */}
       <div

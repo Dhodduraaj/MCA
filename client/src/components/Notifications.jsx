@@ -65,7 +65,7 @@ function Notifications() {
             transition={{ duration: 0.2 }}
             className="absolute right-0 mt-3 w-80 bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white/20 z-50"
           >
-            <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-[#7209b7]/80 to-[#9d4edd]/80 text-white">
+            <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-[#2e7d32]/80 to-[#4caf50]/80 text-white">
               <span className="font-semibold">Notifications</span>
               <button
                 onClick={clearAll}

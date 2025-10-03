@@ -31,14 +31,14 @@ const createCustomIcon = (color) => {
       font-size: 12px;
       color: white;
       font-weight: bold;
-    ">${color === '#3B82F6' ? '🏦' : '🏧'}</div>`,
+    ">${color === '#2e7d32' ? '🌳' : '🍃'}</div>`,
     iconSize: [25, 25],
     iconAnchor: [12, 12],
   });
 };
 
-const bankIcon = createCustomIcon('#3B82F6');
-const atmIcon = createCustomIcon('#10B981');
+const bankIcon = createCustomIcon('#2e7d32');
+const atmIcon = createCustomIcon('#4caf50');
 
 function PanTo({ position }) {
   const map = useMap();
@@ -167,7 +167,7 @@ function Locator() {
               <Marker key={bank.id} position={bank.position} icon={bankIcon}>
                 <Popup>
                   <div className="text-center">
-                    <div className="text-2xl mb-2">🏦</div>
+                    <div className="text-2xl mb-2">🌳</div>
                     <strong>{bank.name}</strong>
                     <br />
                     {bank.distance.toFixed(2)} km away
@@ -200,7 +200,7 @@ function Locator() {
           {/* Banks */}
           <div>
             <h4 className="text-md font-semibold text-blue-600 mb-3 flex items-center">
-              <span className="text-xl mr-2">🏦</span> Banks
+              <span className="text-xl mr-2">🌳</span> Eco-Friendly Banks
             </h4>
             {banks.map((bank, i) => (
               <div
@@ -211,7 +211,7 @@ function Locator() {
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">🏦</div>
+                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold">🌳</div>
                   <div>
                     <h4 className="font-medium">{bank.name}{i === 0 && ' (Nearest)'}</h4>
                     <p className="text-sm font-semibold text-blue-600">{bank.distance.toFixed(2)} km away</p>

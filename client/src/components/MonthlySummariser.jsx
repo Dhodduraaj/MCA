@@ -42,7 +42,7 @@ function MonthlySummariser() {
           className={`w-full py-2 px-4 rounded-lg font-medium text-white transition transform hover:scale-[1.03] ${
             loading
               ? "bg-purple-300 cursor-not-allowed"
-              : "bg-gradient-to-r from-[#7209b7] to-[#9d4edd] shadow-md"
+              : "bg-gradient-to-r from-[#2e7d32] to-[#4caf50] shadow-md"
           }`}
         >
           {loading ? "Fetching..." : "✨ Generate Summary"}

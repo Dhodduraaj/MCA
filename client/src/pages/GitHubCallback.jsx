@@ -42,7 +42,7 @@ const GitHubCallback = () => {
   }, [searchParams]);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc]">
+    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
         <p className="text-gray-600">Completing GitHub login...</p>

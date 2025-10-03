@@ -50,7 +50,7 @@ function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] flex flex-col">
       {/* ================= Hero Section ================= */}
       <section
         id="hero"
@@ -63,7 +63,7 @@ function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-5xl md:text-6xl font-extrabold text-[#2b2d42] tracking-tight leading-tight"
           >
-            Welcome to <span className="text-[#9d4edd]">Zenith</span>
+            Welcome to <span className="text-[#2e7d32]">Greefin</span>
           </motion.h1>
 
           <motion.p
@@ -72,9 +72,9 @@ function HomePage() {
             transition={{ delay: 0.15, duration: 0.6 }}
             className="mt-6 text-lg md:text-xl text-[#2b2d42]/80 leading-relaxed"
           >
-            Your personal <span className="font-semibold text-[#7209b7]">finance tracker </span> 
+            Your personal <span className="font-semibold text-[#2e7d32]">eco-friendly finance tracker </span> 
             designed to help you stay on top of your expenses, savings, and investments.  
-            With Zenith, managing money becomes simple, smart, and stress-free 💰.
+            With Greefin, managing money becomes simple, smart, and eco-friendly 🌳.
           </motion.p>
 
           <motion.div
@@ -85,7 +85,7 @@ function HomePage() {
           >
             <button
               onClick={() => navigate("/login")}
-              className="px-10 py-4 rounded-xl text-white font-semibold shadow-lg text-lg bg-gradient-to-r from-[#7209b7] to-[#9d4edd] hover:scale-105 hover:shadow-xl transition"
+              className="px-10 py-4 rounded-xl text-white font-semibold shadow-lg text-lg bg-gradient-to-r from-[#2e7d32] to-[#4caf50] hover:scale-105 hover:shadow-xl transition"
             >
               Get Started
             </button>
@@ -106,7 +106,7 @@ function HomePage() {
             Meet the Team 🚀
           </h2>
           <p className="mt-4 text-[#2b2d42]/80 text-lg max-w-2xl mx-auto">
-            We’re the builders behind Zenith – passionate problem solvers 
+            We're the builders behind Greefin – passionate problem solvers 
             dedicated to making financial tracking seamless and empowering.
           </p>
         </div>
@@ -119,7 +119,7 @@ function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="rounded-2xl shadow-xl hover:shadow-2xl transition-transform transform hover:-translate-y-3 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl p-6 flex flex-col items-center text-center border border-white/60 hover:border-[#9d4edd]/40"
+              className="rounded-2xl shadow-xl hover:shadow-2xl transition-transform transform hover:-translate-y-3 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl p-6 flex flex-col items-center text-center border border-white/60 hover:border-[#2e7d32]/40"
             >
               <img
                 src={member.img}
