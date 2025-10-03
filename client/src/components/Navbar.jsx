@@ -40,7 +40,6 @@ function Navbar({ user, setUser }) {
             <Link to="/" className="text-white/90 hover:text-white transition font-medium">Dashboard</Link>
             <Link to="/transactions" className="text-white/90 hover:text-white transition font-medium">Transactions</Link>
             <Link to="/budgets" className="text-white/90 hover:text-white transition font-medium">Budgets</Link>
-            <Link to="/myspace" className="text-white/90 hover:text-white transition font-medium">MySpace</Link>
           </div>
         )}
 

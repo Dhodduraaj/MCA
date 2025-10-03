@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { calculateEcoScore, getEcoPersona } from "../utils/ecoScore";
+import { calculateEcoProfile } from "../utils/ecoScore";
 import { clearOldUserData, setUserSpecificData } from "../utils/userData";
 
 function EcoSurvey() {
@@ -29,6 +29,29 @@ function EcoSurvey() {
     recycling: "",
     goal: ""
   });
+
+  // Real-time eco profile state
+  const [ecoProfile, setEcoProfile] = useState({
+    score: 0,
+    persona: "Eco Explorer",
+    xp: 0,
+    badges: []
+  });
+
+  // UI feedback state (simplified for direct redirect)
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [currentFact, setCurrentFact] = useState("");
+
+  // Real-time calculation effect (background only)
+  useEffect(() => {
+    const newProfile = calculateEcoProfile(surveyData);
+    setEcoProfile(newProfile);
+  }, [surveyData]);
+
+  // No feedback during survey - only after completion
+  const showAnswerFeedback = () => {
+    // Disabled during survey
+  };
 
   const categories = [
     {
@@ -232,6 +255,11 @@ function EcoSurvey() {
       ...prev,
       [questionId]: value
     }));
+    
+    // Debounce feedback to avoid too frequent updates
+    setTimeout(() => {
+      showAnswerFeedback();
+    }, 500);
   };
 
   const handleNext = () => {
@@ -247,19 +275,20 @@ function EcoSurvey() {
   };
 
   const handleSubmit = async () => {
-    // Calculate eco score and persona
-    const ecoScore = calculateEcoScore(surveyData);
-    const persona = getEcoPersona(ecoScore);
+    // Calculate eco profile with XP and badges
+    const finalProfile = calculateEcoProfile(surveyData);
     
     // Clear old user data first
     clearOldUserData();
     
     // Store user-specific data
     setUserSpecificData('ecoSurveyData', surveyData);
-    setUserSpecificData('ecoPersona', persona);
-    setUserSpecificData('ecoScore', ecoScore);
+    setUserSpecificData('ecoPersona', finalProfile.persona);
+    setUserSpecificData('ecoScore', finalProfile.score);
+    setUserSpecificData('ecoXP', finalProfile.xp);
+    setUserSpecificData('ecoBadges', finalProfile.badges);
     
-    // Show welcome modal and redirect
+    // Show welcome modal and redirect immediately
     navigate("/dashboard", { state: { showWelcomeModal: true } });
   };
 
@@ -293,6 +322,7 @@ function EcoSurvey() {
             Help us understand your lifestyle to personalize your eco-journey!
           </p>
         </motion.div>
+
 
         {/* Progress Bar */}
         <motion.div
@@ -398,10 +428,9 @@ function EcoSurvey() {
               </div>
             ))}
           </div>
-        </motion.div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between">
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-8">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -445,7 +474,9 @@ function EcoSurvey() {
               Next →
             </motion.button>
           )}
-        </div>
+          </div>
+        </motion.div>
+
       </div>
     </div>
   );

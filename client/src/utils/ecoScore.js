@@ -1,6 +1,6 @@
-// Eco Score Calculation Utility
+// Enhanced Eco Score Calculation Utility with XP and Badges
 
-export const calculateEcoScore = (surveyData) => {
+export const calculateEcoProfile = (surveyData) => {
   const weights = {
     travel: 30,
     food: 20,
@@ -11,35 +11,64 @@ export const calculateEcoScore = (surveyData) => {
 
   let totalScore = 0;
   let maxPossibleScore = 0;
+  let xp = 0;
+  let badges = [];
 
   // Travel & Commuting (30 points)
   const travelScore = calculateTravelScore(surveyData);
   totalScore += travelScore * (weights.travel / 100);
   maxPossibleScore += weights.travel;
+  xp += calculateTravelXP(surveyData);
+  badges.push(...calculateTravelBadges(surveyData));
 
   // Food & Diet (20 points)
   const foodScore = calculateFoodScore(surveyData);
   totalScore += foodScore * (weights.food / 100);
   maxPossibleScore += weights.food;
+  xp += calculateFoodXP(surveyData);
+  badges.push(...calculateFoodBadges(surveyData));
 
   // Shopping & Consumption (15 points)
   const shoppingScore = calculateShoppingScore(surveyData);
   totalScore += shoppingScore * (weights.shopping / 100);
   maxPossibleScore += weights.shopping;
+  xp += calculateShoppingXP(surveyData);
+  badges.push(...calculateShoppingBadges(surveyData));
 
   // Energy & Home (20 points)
   const energyScore = calculateEnergyScore(surveyData);
   totalScore += energyScore * (weights.energy / 100);
   maxPossibleScore += weights.energy;
+  xp += calculateEnergyXP(surveyData);
+  badges.push(...calculateEnergyBadges(surveyData));
 
   // Habits & Mindset (15 points)
   const habitsScore = calculateHabitsScore(surveyData);
   totalScore += habitsScore * (weights.habits / 100);
   maxPossibleScore += weights.habits;
+  xp += calculateHabitsXP(surveyData);
+  badges.push(...calculateHabitsBadges(surveyData));
 
   // Normalize to 0-100
   const normalizedScore = Math.round((totalScore / maxPossibleScore) * 100);
-  return Math.min(100, Math.max(0, normalizedScore));
+  const finalScore = Math.min(100, Math.max(0, normalizedScore));
+  
+  // Add bonus XP for high scores
+  if (finalScore >= 80) xp += 50;
+  else if (finalScore >= 60) xp += 30;
+  else if (finalScore >= 40) xp += 20;
+
+  return {
+    score: finalScore,
+    persona: getEcoPersona(finalScore),
+    xp: Math.round(xp),
+    badges: [...new Set(badges)] // Remove duplicates
+  };
+};
+
+// Legacy function for backward compatibility
+export const calculateEcoScore = (surveyData) => {
+  return calculateEcoProfile(surveyData).score;
 };
 
 export const getEcoPersona = (score) => {
@@ -262,4 +291,145 @@ export const getPersonalizedTips = (surveyData, score) => {
   }
 
   return tips.length > 0 ? tips : ["Start with small changes - every step counts! 🌱"];
+};
+
+// XP Calculation Functions
+const calculateTravelXP = (data) => {
+  let xp = 0;
+  if (data.commute === "walk") xp += 15;
+  else if (data.commute === "cycle") xp += 12;
+  else if (data.commute === "public") xp += 10;
+  else if (data.commute === "bike") xp += 8;
+  else if (data.commute === "carpool") xp += 6;
+  
+  if (data.rideHailing === "never") xp += 10;
+  else if (data.rideHailing === "rarely") xp += 7;
+  
+  const km = parseInt(data.weeklyKm) || 0;
+  if (km === 0) xp += 15;
+  else if (km <= 50) xp += 12;
+  else if (km <= 100) xp += 8;
+  
+  return xp;
+};
+
+const calculateFoodXP = (data) => {
+  let xp = 0;
+  if (data.meatConsumption === "never") xp += 12;
+  else if (data.meatConsumption === "rarely") xp += 8;
+  
+  if (data.eatingOut === "never") xp += 8;
+  else if (data.eatingOut === "monthly") xp += 6;
+  
+  if (data.organicFood === "always") xp += 10;
+  else if (data.organicFood === "often") xp += 7;
+  
+  return xp;
+};
+
+const calculateShoppingXP = (data) => {
+  let xp = 0;
+  if (data.clothesFrequency === "rarely") xp += 8;
+  else if (data.clothesFrequency === "seasonally") xp += 6;
+  
+  if (data.ecoBrands === "always") xp += 10;
+  else if (data.ecoBrands === "often") xp += 7;
+  
+  if (data.reusableBags === "always") xp += 8;
+  else if (data.reusableBags === "often") xp += 5;
+  
+  return xp;
+};
+
+const calculateEnergyXP = (data) => {
+  let xp = 0;
+  if (data.electricityBill === "low") xp += 12;
+  else if (data.electricityBill === "medium") xp += 8;
+  
+  if (data.switchOffAppliances === "always") xp += 10;
+  else if (data.switchOffAppliances === "often") xp += 7;
+  
+  if (data.energyEfficient === "all") xp += 10;
+  else if (data.energyEfficient === "most") xp += 7;
+  
+  return xp;
+};
+
+const calculateHabitsXP = (data) => {
+  let xp = 0;
+  if (data.reusableBottles === "always") xp += 12;
+  else if (data.reusableBottles === "often") xp += 8;
+  
+  if (data.recycling === "always") xp += 10;
+  else if (data.recycling === "often") xp += 7;
+  
+  return xp;
+};
+
+// Badge Calculation Functions
+const calculateTravelBadges = (data) => {
+  const badges = [];
+  
+  if (data.commute === "walk") badges.push("🚶‍♂️ Walker");
+  if (data.commute === "cycle") badges.push("🚴‍♂️ Cyclist");
+  if (data.rideHailing === "never") badges.push("🚗 Car-Free");
+  if (parseInt(data.weeklyKm) === 0) badges.push("🌱 Zero Emissions");
+  
+  return badges;
+};
+
+const calculateFoodBadges = (data) => {
+  const badges = [];
+  
+  if (data.meatConsumption === "never") badges.push("🥬 Plant-Based");
+  if (data.eatingOut === "never") badges.push("👨‍🍳 Home Chef");
+  if (data.organicFood === "always") badges.push("🌿 Organic Lover");
+  
+  return badges;
+};
+
+const calculateShoppingBadges = (data) => {
+  const badges = [];
+  
+  if (data.clothesFrequency === "rarely") badges.push("👕 Minimalist");
+  if (data.ecoBrands === "always") badges.push("🌱 Eco Shopper");
+  if (data.reusableBags === "always") badges.push("🛍️ Reusable Hero");
+  
+  return badges;
+};
+
+const calculateEnergyBadges = (data) => {
+  const badges = [];
+  
+  if (data.electricityBill === "low") badges.push("⚡ Energy Saver");
+  if (data.switchOffAppliances === "always") badges.push("🔌 Power Conscious");
+  if (data.energyEfficient === "all") badges.push("💡 Efficiency Expert");
+  
+  return badges;
+};
+
+const calculateHabitsBadges = (data) => {
+  const badges = [];
+  
+  if (data.reusableBottles === "always") badges.push("🍶 Bottle Champion");
+  if (data.recycling === "always") badges.push("♻️ Recycling Master");
+  
+  return badges;
+};
+
+// Eco Facts for real-time feedback
+export const getEcoFacts = () => {
+  const facts = [
+    "🌱 Walking 1km instead of driving saves 0.2kg CO₂!",
+    "🚴‍♂️ Cycling to work burns 300 calories per hour!",
+    "🥬 Going meat-free one day saves 2,500 liters of water!",
+    "♻️ Recycling one aluminum can saves enough energy to power a TV for 3 hours!",
+    "💡 LED bulbs use 75% less energy than incandescent bulbs!",
+    "🌿 Organic farming reduces pesticide use by 95%!",
+    "🚗 Carpooling with 3 people reduces emissions by 75%!",
+    "🛍️ A reusable bag can replace 1,000 plastic bags!",
+    "💧 A dripping faucet wastes 3,000 gallons of water per year!",
+    "🌳 One tree absorbs 22kg of CO₂ per year!"
+  ];
+  return facts[Math.floor(Math.random() * facts.length)];
 };
