@@ -104,12 +104,25 @@ export const hasUserCompletedSurvey = () => {
 
 export const getUserEcoData = () => {
   const surveyData = getUserSpecificData('ecoSurveyData');
-  const persona = localStorage.getItem(getUserSpecificKey('ecoPersona'));
-  const score = localStorage.getItem(getUserSpecificKey('ecoScore'));
-  
+  const personaRaw = localStorage.getItem(getUserSpecificKey('ecoPersona'));
+  const scoreRaw = localStorage.getItem(getUserSpecificKey('ecoScore'));
+  const xpRaw = localStorage.getItem(getUserSpecificKey('ecoXP'));
+  const badgesRaw = localStorage.getItem(getUserSpecificKey('ecoBadges'));
+
+  const score = scoreRaw ? parseInt(scoreRaw, 10) : null;
+  const xp = xpRaw ? parseInt(xpRaw, 10) : null;
+  let badges = [];
+  try {
+    badges = badgesRaw ? JSON.parse(badgesRaw) : [];
+  } catch {
+    badges = [];
+  }
+
   return {
-    surveyData,
-    persona: persona || "Eco Explorer",
-    score: score ? parseInt(score) : 25
+    surveyData: surveyData || null,
+    persona: personaRaw || "Eco Explorer",
+    score: Number.isFinite(score) ? score : 0,
+    xp: Number.isFinite(xp) ? xp : 0,
+    badges
   };
 };

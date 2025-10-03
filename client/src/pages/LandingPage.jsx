@@ -5,13 +5,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ExchangeRateChart from "../components/ExchangeRateChart";
 import FinancialNewsCarouselLanding from "../components/FinancialNewsCarouselLanding";
 import Quotes from "../components/quotes";
-import WelcomeModal from "../components/WelcomeModal";
+// Removed WelcomeModal to show results inline on the dashboard
 import { getPersonalizedTips } from "../utils/ecoScore";
 import { clearAllUserSpecificData, clearOldUserData, getCurrentUserInfo, getUserEcoData, hasUserCompletedSurvey } from "../utils/userData";
 
 function LandingPage() {
   const [message, setMessage] = useState("");
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  // Removed welcome modal state
   const [ecoPersona, setEcoPersona] = useState("Eco Explorer");
   const [ecoScore, setEcoScore] = useState(25);
   const [ecoXP, setEcoXP] = useState(0);
@@ -37,10 +37,7 @@ function LandingPage() {
     };
     fetchData();
 
-    // Check for welcome modal
-    if (location.state?.showWelcomeModal) {
-      setShowWelcomeModal(true);
-    }
+    // Welcome modal no longer used
 
     // Get current user info
     const currentUser = getCurrentUserInfo();
@@ -290,15 +287,7 @@ function LandingPage() {
         </div>
       </div>
 
-      {/* Welcome Modal */}
-      <WelcomeModal
-        isOpen={showWelcomeModal}
-        onClose={() => setShowWelcomeModal(false)}
-        persona={ecoPersona}
-        ecoScore={ecoScore}
-        ecoXP={ecoXP}
-        ecoBadges={ecoBadges}
-      />
+      {/* Welcome modal removed: results are displayed inline above */}
     </div>
   );
 }

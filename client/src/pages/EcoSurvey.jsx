@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { calculateEcoProfile } from "../utils/ecoScore";
+import { calculateEcoProfile, getPersonalizedTips } from "../utils/ecoScore";
 import { clearOldUserData, setUserSpecificData } from "../utils/userData";
 
 function EcoSurvey() {
@@ -277,19 +277,21 @@ function EcoSurvey() {
   const handleSubmit = async () => {
     // Calculate eco profile with XP and badges
     const finalProfile = calculateEcoProfile(surveyData);
-    
+    const tips = getPersonalizedTips(surveyData, finalProfile.score);
+
     // Clear old user data first
     clearOldUserData();
-    
-    // Store user-specific data
+
+    // Store user-specific data together for consistency
     setUserSpecificData('ecoSurveyData', surveyData);
     setUserSpecificData('ecoPersona', finalProfile.persona);
     setUserSpecificData('ecoScore', finalProfile.score);
     setUserSpecificData('ecoXP', finalProfile.xp);
     setUserSpecificData('ecoBadges', finalProfile.badges);
-    
-    // Show welcome modal and redirect immediately
-    navigate("/dashboard", { state: { showWelcomeModal: true } });
+    setUserSpecificData('ecoTips', tips);
+
+    // Redirect to dashboard directly (no modal)
+    navigate("/dashboard");
   };
 
   const currentCategory = categories[currentStep];

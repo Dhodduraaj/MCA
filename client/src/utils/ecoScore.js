@@ -16,42 +16,42 @@ export const calculateEcoProfile = (surveyData) => {
 
   // Travel & Commuting (30 points)
   const travelScore = calculateTravelScore(surveyData);
-  totalScore += travelScore * (weights.travel / 100);
+  totalScore += (travelScore / 30) * weights.travel; // normalize by category max
   maxPossibleScore += weights.travel;
   xp += calculateTravelXP(surveyData);
   badges.push(...calculateTravelBadges(surveyData));
 
   // Food & Diet (20 points)
   const foodScore = calculateFoodScore(surveyData);
-  totalScore += foodScore * (weights.food / 100);
+  totalScore += (foodScore / 20) * weights.food;
   maxPossibleScore += weights.food;
   xp += calculateFoodXP(surveyData);
   badges.push(...calculateFoodBadges(surveyData));
 
   // Shopping & Consumption (15 points)
   const shoppingScore = calculateShoppingScore(surveyData);
-  totalScore += shoppingScore * (weights.shopping / 100);
+  totalScore += (shoppingScore / 15) * weights.shopping;
   maxPossibleScore += weights.shopping;
   xp += calculateShoppingXP(surveyData);
   badges.push(...calculateShoppingBadges(surveyData));
 
   // Energy & Home (20 points)
   const energyScore = calculateEnergyScore(surveyData);
-  totalScore += energyScore * (weights.energy / 100);
+  totalScore += (energyScore / 20) * weights.energy;
   maxPossibleScore += weights.energy;
   xp += calculateEnergyXP(surveyData);
   badges.push(...calculateEnergyBadges(surveyData));
 
   // Habits & Mindset (15 points)
   const habitsScore = calculateHabitsScore(surveyData);
-  totalScore += habitsScore * (weights.habits / 100);
+  totalScore += (habitsScore / 15) * weights.habits;
   maxPossibleScore += weights.habits;
   xp += calculateHabitsXP(surveyData);
   badges.push(...calculateHabitsBadges(surveyData));
 
   // Normalize to 0-100
-  const normalizedScore = Math.round((totalScore / maxPossibleScore) * 100);
-  const finalScore = Math.min(100, Math.max(0, normalizedScore));
+  const normalizedScore = (totalScore / maxPossibleScore) * 100; // should already be 0-100
+  const finalScore = Math.min(100, Math.max(0, Math.round(normalizedScore)));
   
   // Add bonus XP for high scores
   if (finalScore >= 80) xp += 50;
