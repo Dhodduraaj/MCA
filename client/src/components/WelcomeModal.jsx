@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { getCurrentUserInfo } from "../utils/userData";
 
-function WelcomeModal({ isOpen, onClose, persona, ecoScore }) {
+function WelcomeModal({ isOpen, onClose, persona, ecoScore, ecoXP, ecoBadges }) {
   if (!isOpen) return null;
 
   const userInfo = getCurrentUserInfo();
@@ -77,6 +77,42 @@ function WelcomeModal({ isOpen, onClose, persona, ecoScore }) {
             </p>
           </div>
         </div>
+
+        {/* XP and Badges */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {/* XP Display */}
+          <div className="bg-blue-50 rounded-xl p-4 text-center">
+            <div className="text-3xl font-bold text-blue-700 mb-1">
+              {ecoXP || 0}
+            </div>
+            <div className="text-sm text-blue-600">XP Earned</div>
+          </div>
+          
+          {/* Badges Count */}
+          <div className="bg-yellow-50 rounded-xl p-4 text-center">
+            <div className="text-3xl font-bold text-yellow-700 mb-1">
+              {ecoBadges?.length || 0}
+            </div>
+            <div className="text-sm text-yellow-600">Badges Unlocked</div>
+          </div>
+        </div>
+
+        {/* Badges Display */}
+        {ecoBadges && ecoBadges.length > 0 && (
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold text-gray-800 mb-3">🏆 Your Badges:</h4>
+            <div className="flex flex-wrap gap-2">
+              {ecoBadges.map((badge, index) => (
+                <span
+                  key={index}
+                  className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Quick Tips */}
         <div className="mb-6">
